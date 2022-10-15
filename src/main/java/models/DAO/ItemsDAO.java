@@ -11,6 +11,8 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 import java.util.List;
 
+
+
 public class ItemsDAO {
     private static final Logger logger = LoggerFactory.getLogger(ItemsDAO.class);
 
@@ -44,7 +46,12 @@ public class ItemsDAO {
             transaction.begin();
 
             Item object = em.find(Item.class, id);
+
+            if (object.getAvailability() == Availability.DISPONIBILE) {
             object.setAvailability(Availability.PRESTATO);
+            }else{
+                object.setAvailability(Availability.DISPONIBILE);
+            }
 
             transaction.commit();
         } catch (Exception ex) {
@@ -78,7 +85,7 @@ public class ItemsDAO {
             EntityTransaction transaction = em.getTransaction();
             transaction.begin();
 
-            em.remove(em.merge(object));
+            em.remove(em.contains(object) ? object : em.merge(object));
 
             transaction.commit();
         } catch (Exception ex) {
@@ -103,69 +110,28 @@ public class ItemsDAO {
         }
     }
 
-    public static void getByYear(String y) {
-
+    public static List<Item> getItemByTile(String title) {
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-
         try {
-            Query q = em.createQuery(
-                    "SELECT e FROM Item e WHERE e.year = :y");
 
-            List<Item> e = q.getResultList();
+            Query query = em.createNamedQuery( "findByTitle" );
 
-            if (e.size() != 0) {
-                for (Item ev : e) {
-                    System.out.println(ev);
-                }
-            } else {
-                System.out.println("Nessun elemento trovato");
-            }
+            query.setParameter( "title", title );
+            return query.getResultList();
 
         } finally {
             em.close();
         }
     }
 
-    public static void getByAutor(String a) {
-
+    public static List<Item> getItemByAuthor(String author) {
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-
         try {
-            Query q = em.createQuery(
-                    "SELECT e FROM Item e WHERE e.author = :a");
 
-            List<Item> e = q.getResultList();
+            Query query = em.createNamedQuery( "libroByAuthor" );
 
-            if (e.size() != 0) {
-                for (Item ev : e) {
-                    System.out.println(ev);
-                }
-            } else {
-                System.out.println("Nessun elemento trovato");
-            }
-
-        } finally {
-            em.close();
-        }
-    }
-
-    public static void getByTitle(String y) {
-
-        EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
-
-        try {
-            Query q = em.createQuery(
-                    "SELECT e FROM Item e WHERE e.title = upper %:y%");
-
-            List<Item> e = q.getResultList();
-
-            if (e.size() != 0) {
-                for (Item ev : e) {
-                    System.out.println(ev);
-                }
-            } else {
-                System.out.println("Nessun elemento trovato");
-            }
+            query.setParameter( "author", author );
+            return query.getResultList();
 
         } finally {
             em.close();

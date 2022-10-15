@@ -23,5 +23,6 @@ public class User {
     @Column(name = "birth_date")
     private String birthDate;
     @OneToMany(mappedBy = "user")
+    @ToString.Exclude
     private List<Loan> list;
 }

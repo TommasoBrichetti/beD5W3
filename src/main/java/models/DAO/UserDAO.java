@@ -66,7 +66,7 @@ public class UserDAO {
 
     }
 
-    public User getById(Long id) {
+    public static User getById(Long id) {
         EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
         try {
 
